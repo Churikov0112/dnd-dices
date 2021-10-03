@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:dnd_dices/main.dart';
-import 'package:dnd_dices/main_drawer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -14,36 +13,26 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final int minNumber = 1;
-  int result;
+  int result = 0;
+  int preResult = 0;
   bool isFakeLoading = false;
 
-  //сердце нашего приложения
-  Future<void> randomize(int maxNumber) async {
-    int preResult = Random().nextInt(maxNumber) + 1;
-    // метод рандом от нуля до maxNumber-1, так что прибавляем единицу к результату
+  Future<void> randomize(int maxValue, int numberOfDices) async {
     setState(() {
       isFakeLoading = true;
     });
     await Future.delayed(
       Duration(milliseconds: 700),
       () {
-        if (isCheatActive == true) {
-          //проверка, чтобы число + чит не было больше max
-          if (preResult + 3 < maxNumber) {
-            result = preResult + 3;
-          } else {
-            result = maxNumber;
-          }
-        } else {
-          result = preResult;
+        for (var i = 1; i <= numberOfDices; i++) {
+          preResult += Random().nextInt(maxValue) + 1;
+          print(preResult);
         }
-
+        result = preResult;
+        preResult = 0;
         setState(() {
           isFakeLoading = false;
         });
-        // Return number
-        return result;
       },
     );
   }
@@ -58,16 +47,16 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       onPressed: () {
         setState(() {
-          result = null;
+          result = 0;
         });
       },
     );
   }
 
-  Widget returnDiceButton(int maxNumber) {
+  Widget returnDiceButton(int maxNumber, BuildContext context) {
     return InkWell(
       onTap: () {
-        randomize(maxNumber);
+        showHowManyDicesDialog(context, maxNumber);
       },
       child: Padding(
         padding: const EdgeInsets.all(3.0),
@@ -112,7 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ? CircularProgressIndicator(
                 color: Theme.of(context).accentColor,
               )
-            : result == null
+            : result == 0
                 ? currentTheme
                     ? Image.asset(
                         'lib/assets/dice.png',
@@ -157,12 +146,116 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Widget returnHowManyDicesButton(
+    int number,
+    int dice,
+  ) {
+    return InkWell(
+      child: CircleAvatar(
+        radius: 25,
+        backgroundColor: Theme.of(context).accentColor,
+        child: CircleAvatar(
+          radius: 22,
+          backgroundColor: (currentTheme == true)
+              ? Colors.white
+              : Theme.of(context).primaryColor,
+          child: Center(
+            child: Text(
+              '$number',
+              style: TextStyle(
+                fontSize: 20,
+                color: Theme.of(context).accentColor,
+              ),
+            ),
+          ),
+        ),
+      ),
+      onTap: () {
+        Navigator.of(context).pop();
+        randomize(dice, number);
+      },
+    );
+  }
+
+// диалог для изменения возраста
+  void showHowManyDicesDialog(
+    BuildContext context,
+    int dice,
+  ) {
+    showModalBottomSheet<void>(
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      context: context,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: MediaQuery.of(context).viewInsets,
+          child: Padding(
+            padding: const EdgeInsets.only(
+              left: 15,
+              right: 15,
+              bottom: 49,
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).backgroundColor,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  // SizedBox(height: 15),
+                  Padding(
+                    padding: const EdgeInsets.all(15),
+                    child: Text(
+                      'Сколько кубиков кинуть?',
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Theme.of(context).accentColor,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(15),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        returnHowManyDicesButton(1, dice),
+                        returnHowManyDicesButton(2, dice),
+                        returnHowManyDicesButton(3, dice),
+                        returnHowManyDicesButton(4, dice),
+                        returnHowManyDicesButton(5, dice),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(15),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        returnHowManyDicesButton(6, dice),
+                        returnHowManyDicesButton(7, dice),
+                        returnHowManyDicesButton(8, dice),
+                        returnHowManyDicesButton(9, dice),
+                        returnHowManyDicesButton(10, dice),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 15)
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Size deviceSize = MediaQuery.of(context).size;
 
     return Scaffold(
-      drawer: MainDrawer(),
       appBar: AppBar(
         //elevation: 0,
         backgroundColor: Theme.of(context).primaryColor,
@@ -187,27 +280,28 @@ class _MyHomePageState extends State<MyHomePage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        returnDiceButton(4),
-                        returnDiceButton(6),
-                        returnDiceButton(8),
+                        returnDiceButton(4, context),
+                        returnDiceButton(6, context),
+                        returnDiceButton(8, context),
                       ],
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        returnDiceButton(10),
-                        returnDiceButton(12),
-                        returnDiceButton(100),
+                        returnDiceButton(10, context),
+                        returnDiceButton(12, context),
+                        returnDiceButton(100, context),
                       ],
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         returnChangeThemeButton(),
-                        returnDiceButton(20),
+                        returnDiceButton(20, context),
                         returnDeleteButton(),
                       ],
                     ),
+                    SizedBox(height: 10),
                   ],
                 ),
               ),
