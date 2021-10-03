@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
                 )
               : ThemeData.dark(),
           debugShowCheckedModeBanner: false,
-          home: MyHomePage(title: 'Your favorite dices'),
+          home: MyHomePage(),
           routes: {
             AboutUsScreen().routeName: (ctx) => AboutUsScreen(),
           },

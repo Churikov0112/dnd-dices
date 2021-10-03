@@ -9,10 +9,6 @@ import 'package:flutter/material.dart';
 var currentTheme = true;
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
-
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -113,7 +109,9 @@ class _MyHomePageState extends State<MyHomePage> {
       //color: Colors.red,
       child: Center(
         child: isFakeLoading
-            ? CircularProgressIndicator()
+            ? CircularProgressIndicator(
+                color: Theme.of(context).accentColor,
+              )
             : result == null
                 ? currentTheme
                     ? Image.asset(
@@ -167,9 +165,9 @@ class _MyHomePageState extends State<MyHomePage> {
       drawer: MainDrawer(),
       appBar: AppBar(
         //elevation: 0,
-
+        backgroundColor: Theme.of(context).primaryColor,
         title: Text(
-          widget.title,
+          'Your favorite dices',
           style: TextStyle(
             color: Theme.of(context).accentColor,
           ),
@@ -180,37 +178,38 @@ class _MyHomePageState extends State<MyHomePage> {
           Expanded(child: Container()),
           returnHublot(deviceSize),
           Expanded(child: Container()),
-          Padding(
-            padding: const EdgeInsets.only(left: 10, right: 10),
-            child: Container(
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      returnDiceButton(4),
-                      returnDiceButton(6),
-                      returnDiceButton(8),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      returnDiceButton(10),
-                      returnDiceButton(12),
-                      returnDiceButton(100),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      returnChangeThemeButton(),
-                      returnDiceButton(20),
-                      returnDeleteButton(),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                ],
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 10, right: 10),
+              child: Container(
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        returnDiceButton(4),
+                        returnDiceButton(6),
+                        returnDiceButton(8),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        returnDiceButton(10),
+                        returnDiceButton(12),
+                        returnDiceButton(100),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        returnChangeThemeButton(),
+                        returnDiceButton(20),
+                        returnDeleteButton(),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
